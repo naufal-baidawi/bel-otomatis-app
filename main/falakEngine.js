@@ -10,11 +10,11 @@
 // 7. Kalender Masehi, Pasaran Jawa (Selapan / Us 1-35), & Konversi Hijriah
 // =========================================================================
 
-// Default koordinat awal: Paiton, Probolinggo, East Java, Indonesia (Sesuai Digital Falak)
-let currentLat = -7.71105;
-let currentLon = 113.49556;
-let currentElevation = 0;
-let currentLocationName = 'Paiton Probolinggo East Java Indonesia';
+// Default koordinat awal: Pondok Pesantren Nurul Jadid, Paiton, Probolinggo (-7.710508, 113.496974)
+let currentLat = -7.710508;
+let currentLon = 113.496974;
+let currentElevation = 10;
+let currentLocationName = "Pondok Pesantren Nurul Jadid, Paiton, Probolinggo";
 
 // Parser koordinat: mendukung desimal (-7.71105) maupun DMS (-7°42'39.78" / 7° 42' 39.78" LS)
 function parseCoordinate(input, fallback = 0) {

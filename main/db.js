@@ -19,10 +19,10 @@ function initDatabase() {
 
     CREATE TABLE IF NOT EXISTS prayer_settings (
       id INTEGER PRIMARY KEY CHECK (id = 1),
-      location_name TEXT DEFAULT 'Paiton Probolinggo East Java Indonesia',
-      latitude REAL DEFAULT -7.71105,
-      longitude REAL DEFAULT 113.49556,
-      elevation REAL DEFAULT 0,
+      location_name TEXT DEFAULT 'Pondok Pesantren Nurul Jadid, Paiton, Probolinggo',
+      latitude REAL DEFAULT -7.710508,
+      longitude REAL DEFAULT 113.496974,
+      elevation REAL DEFAULT 10,
       timezone REAL DEFAULT 7.0,
       offset_subuh INTEGER DEFAULT 0,
       offset_dzuhur INTEGER DEFAULT 0,
@@ -51,20 +51,21 @@ function initDatabase() {
 
   const count = db.prepare('SELECT COUNT(*) as c FROM prayer_settings').get();
   if (count.c === 0) {
-    db.prepare('INSERT INTO prayer_settings (id, location_name, latitude, longitude) VALUES (1, ?, ?, ?)').run(
-      'Paiton Probolinggo East Java Indonesia',
-      -7.71105,
-      113.49556
+    db.prepare('INSERT INTO prayer_settings (id, location_name, latitude, longitude, elevation) VALUES (1, ?, ?, ?, ?)').run(
+      'Pondok Pesantren Nurul Jadid, Paiton, Probolinggo',
+      -7.710508,
+      113.496974,
+      10
     );
   } else {
     // Pastikan kolom baru tersedia pada database lama
-    try { db.exec(`ALTER TABLE prayer_settings ADD COLUMN location_name TEXT DEFAULT 'Paiton Probolinggo East Java Indonesia'`); } catch (e) {}
-    try { db.exec(`ALTER TABLE prayer_settings ADD COLUMN elevation REAL DEFAULT 0`); } catch (e) {}
-    // Sinkronkan koordinat default lama (-7.7126, 113.5042) ke koordinat Digital Falak Paiton (-7.71105, 113.49556)
+    try { db.exec(`ALTER TABLE prayer_settings ADD COLUMN location_name TEXT DEFAULT 'Pondok Pesantren Nurul Jadid, Paiton, Probolinggo'`); } catch (e) {}
+    try { db.exec(`ALTER TABLE prayer_settings ADD COLUMN elevation REAL DEFAULT 10`); } catch (e) {}
+    // Sinkronkan ke koordinat presisi Google Maps Nurul Jadid Paiton (-7.710508, 113.496974)
     db.prepare(`
       UPDATE prayer_settings
-      SET latitude = -7.71105, longitude = 113.49556, location_name = COALESCE(location_name, 'Paiton Probolinggo East Java Indonesia')
-      WHERE id = 1 AND (ABS(latitude - (-7.7126)) < 0.0001 OR ABS(latitude - (-7.75)) < 0.0001)
+      SET latitude = -7.710508, longitude = 113.496974, location_name = 'Pondok Pesantren Nurul Jadid, Paiton, Probolinggo', elevation = 10
+      WHERE id = 1 AND (ABS(latitude - (-7.979)) < 0.1 OR ABS(latitude - (-7.71105)) < 0.01 OR ABS(latitude - (-7.7126)) < 0.01 OR ABS(latitude - (-7.75)) < 0.01)
     `).run();
   }
 }

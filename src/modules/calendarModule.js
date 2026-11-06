@@ -33,8 +33,9 @@ function renderLayout() {
               <i class="fa-solid fa-location-crosshairs"></i>
               <span>Sinkron GPS/Maps</span>
             </button>
-            <button onclick="calendarModule.resetPaitonLocation()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition">
-              Default Paiton
+            <button onclick="calendarModule.resetPaitonLocation()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-mosque"></i>
+              <span>Nurul Jadid (Paiton)</span>
             </button>
             <input type="date" id="cal-date-picker" value="${selectedDateStr}" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
             <button onclick="calendarModule.checkDate()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition">Hitung Tanggal</button>
@@ -191,52 +192,58 @@ async function saveManualLocation() {
 
 async function resetPaitonLocation() {
   await ipcRenderer.invoke('set-custom-location', {
-    lat: -7.71105,
-    lon: 113.49556,
-    name: 'Paiton Probolinggo East Java Indonesia',
-    elevation: 0
+    lat: -7.710508,
+    lon: 113.496974,
+    name: "Pondok Pesantren Nurul Jadid, Paiton, Probolinggo",
+    elevation: 10
   });
   await loadCalendarData();
   if (window.prayerModule) window.prayerModule.load();
+  alert("Lokasi berhasil disetel ke:\nPondok Pesantren Nurul Jadid, Paiton\nKoordinat: -7.710508, 113.496974");
 }
 
 async function fetchGPSLocation() {
-  try {
-    const statusEl = document.getElementById('location-status');
-    if (statusEl) statusEl.innerText = 'Menghubungkan ke satelit/maps internet...';
+  const statusEl = document.getElementById('location-status');
+  if (statusEl) statusEl.innerText = 'Mencari koordinat presisi perangkat...';
 
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-
-    if (data && data.latitude && data.longitude) {
-      const lat = data.latitude;
-      const lon = data.longitude;
-      const locName = `${data.city}, ${data.region}, ${data.country_name}`;
-
-      await ipcRenderer.invoke('set-custom-location', { lat, lon, name: locName });
-      await loadCalendarData();
-      if (window.prayerModule) window.prayerModule.load();
-      alert(`Berhasil mengambil koordinat dari Maps/Internet!\nLokasi: ${locName}\nLat/Lon: ${lat}, ${lon}`);
-    } else {
-      throw new Error('Gagal mendeteksi koordinat');
-    }
-  } catch (error) {
-    console.warn('Gagal koneksi internet untuk maps, menggunakan GPS lokal:', error);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
+  // Prioritas 1: Gunakan Geolocation Sensor Perangkat Komputer (Akurat sesuai letak fisik)
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-        const locName = `GPS Komputer (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+        const locName = `Paiton / GPS (${lat.toFixed(6)}, ${lon.toFixed(6)})`;
         await ipcRenderer.invoke('set-custom-location', { lat, lon, name: locName });
         await loadCalendarData();
         if (window.prayerModule) window.prayerModule.load();
-        alert('Berhasil mengambil koordinat dari perangkat komputer!');
-      }, () => {
-        alert('Gagal mengambil koordinat otomatis. Pastikan internet aktif atau isi LT/BT secara manual.');
-      });
-    } else {
-      alert('Geolocation tidak didukung browser.');
+        alert(`Berhasil mendapatkan lokasi GPS presisi!\nKoordinat: ${lat}, ${lon}`);
+      },
+      async (err) => {
+        console.warn('Geolocation lokal ditolak atau gagal, fallback ke IP ISP:', err);
+        await fallbackIPLocation();
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+  } else {
+    await fallbackIPLocation();
+  }
+}
+
+async function fallbackIPLocation() {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    if (data && data.latitude && data.longitude) {
+      const lat = data.latitude;
+      const lon = data.longitude;
+      const locName = `${data.city}, ${data.region}, ${data.country_name} (IP ISP)`;
+      await ipcRenderer.invoke('set-custom-location', { lat, lon, name: locName });
+      await loadCalendarData();
+      if (window.prayerModule) window.prayerModule.load();
+      alert(`Catatan: Geolocation perangkat tidak aktif. Lokasi terdeteksi dari server IP Provider internet Anda:\nLokasi: ${locName}\nKoordinat: ${lat}, ${lon}\n\nTip: Jika lokasi IP berbeda dari posisi Anda sebenarnya, silakan klik tombol "Nurul Jadid (Paiton)" atau ketik koordinat presisi di kolom LT/BT.`);
     }
+  } catch (e) {
+    alert('Gagal mendeteksi koordinat otomatis. Silakan gunakan tombol "Nurul Jadid (Paiton)" atau masukkan LT dan BT secara manual.');
   }
 }
 
