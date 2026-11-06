@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "name": "Bel Otomatis eNJe",
+  "releaseDate": "2026-11-06",
+  "changelog": "• Penentuan waktu shalat hisab hakiki persis Digital Falak mobile.<br>• Jadwal shalat & bel pre-shalat otomatis.<br>• Pop-up interaktif tombol pause/stop suara saat bel berbunyi.<br>• Dukungan operasional 24 jam non-stop (system tray & anti-sleep).<br>• Logo kustom eNJe resmi.",
+  "downloadUrl": "https://github.com/naufal-baidawi/bel-otomatis-app/releases/download/v1.0.0/Bel.Otomatis.eNJe.Setup.1.0.0.exe"
+}

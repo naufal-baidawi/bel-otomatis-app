@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs & installers
+dist/
+
+# Local databases & logs
+*.sqlite
+*.sqlite-journal
+*.log
+
+# Temp files
+.DS_Store
+Thumbs.db
