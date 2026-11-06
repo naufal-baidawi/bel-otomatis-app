@@ -1,7 +1,7 @@
 {
   "name": "bel-otomatis-app",
   "productName": "Bel Otomatis eNJe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aplikasi Bel Otomatis Kegiatan Harian & Jadwal Shalat Digital Falak",
   "main": "main/index.js",
   "scripts": {
